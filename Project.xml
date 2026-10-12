@@ -2,7 +2,11 @@
 <project>
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="FNF': Psych Engine 0.7.3" file="PsychMobile0.7.3" packageName="com.shadowmario.psychengine073" package="com.shadowmario.psychengine073" main="Main" version="1.2.2" company="ShadowMario" />
+	<app file="BlueEngine" packageName="me.funkin.blueengine" package="me.funkin.blueengine" main="Main" version="0.0.1" company="BrenninhoMark" />
+
+	<!-- Titles by platform -->
+	<app title="FNF: Blue Engine" if="mobile" />
+	<app title="Friday Night Funkin' Blue Engine" unless="mobile" />
 
 	<!--Switch Export with Unique ApplicationID and Icon-->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
@@ -69,7 +73,6 @@
 	<assets path="assets/shared"        exclude="*.mp3" unless="web"/>
 	<assets path="assets/mobile"        if="mobile"/>
 	<assets path="assets/videos"        library="videos"  type="binary"       if="VIDEOS_ALLOWED"/>
-	<assets path="assets/mobile"        if="mobile"/>
 	<assets path="assets/songs"         library="songs"         exclude="*.ogg" if="web"/>
 	<assets path="assets/songs"         library="songs"         exclude="*.mp3" unless="web"/>
 	<assets path="assets/week_assets"   library="week_assets"   rename="assets" exclude="*.ogg" if="web"/>
@@ -117,7 +120,7 @@
 	<haxelib name="hxcpp-debug-server" if="debug"/>
 	<haxedef name="HXC_LIBVLC_LOGGING" if="VIDEOS_ALLOWED debug" />
 
-	<!-- Mobile Shit -->
+	<!-- Mobile Settings -->
     <section if="android">
 	    <config:android permission="android.permission.MANAGE_MEDIA"/> 
 		<config:android permission="android.permission.MANAGE_EXTERNAL_STORAGE"/>
@@ -139,7 +142,7 @@
 		<certificate path="key.keystore" password="psychport" alias="psychport" alias-password="psychport" />
     </section>
     
-    <!-- IOS stuff -->
+    <!-- iOS Settings -->
     <section if="ios">
 		<haxedef name="SHARE_MOBILE_FILES" />
 		<config:ios category_type="public.app-category.music-games" />
