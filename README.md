@@ -1,5 +1,5 @@
-# Friday Night Funkin' - Psych Engine Mobile
-Engine originally used on [Mind Games Mod](https://gamebanana.com/mods/301107), intended to be a fix for the vanilla version's many issues while keeping the casual play aspect of it. Also aiming to be an easier alternative to newbie coders.
+# Friday Night Funkin' - Blue Engine
+Blue Engine is a fork of Psych Engine 0.7.3 with more modifications and softcode support.
 
 ## Installation:
 
@@ -15,13 +15,14 @@ to start you off, disabling Videos should be simple, simply Delete the line `"VI
 
 same goes for *Lua Scripts*, comment out or delete the line with `LUA_ALLOWED`, this and other customization options are all available within the `Project.xml` file
 
-## Credits:
+## Blue Engine Credits:
+* BrenninhoMark - Owner
+
+## Psych Engine Credits:
 * Shadow Mario - Programmer
 * Riveren - Artist
-
-## Credits Mobile:
-* StarNova (Cream.BR) - Programmer
-* LumiCoder (FNF BR) - Programmer
+* StarNova (Cream.BR) - Mobile Programmer
+* LumiCoder (FNF BR) - Mobile Programmer
 
 ### Special Thanks
 * bbpanzu - Ex-Programmer
