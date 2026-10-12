@@ -1,13 +1,30 @@
 package backend;
 
-// PsychCamera handles followLerp based on elapsed
-// and stops camera from snapping at higher framerates
+import flixel.FlxCamera;
+import flixel.FlxSprite;
+import flixel.math.FlxMath;
+import flixel.math.FlxPoint;
 
+/**
+ * PsychCamera handles framerate-independent camera tracking (followLerp)
+ * and prevents snapping/jittering at higher or variable framerates.
+ */
 class PsychCamera extends FlxCamera
 {
+	/**
+	 * Separate lerp speed controls for X and Y axes.
+	 * If set below 0, defaults to standard `followLerp`.
+	 */
+	public var followLerpX:Float = -1;
+	public var followLerpY:Float = -1;
+
+	/**
+	 * Toggles exponential decay smoothing vs standard FlxMath.lerp logic.
+	 */
+	public var useDecaySmoothing:Bool = true;
+
 	override public function update(elapsed:Float):Void
 	{
-		// follow the target, if there is one
 		if (target != null)
 		{
 			updateFollowDelta(elapsed);
@@ -25,8 +42,9 @@ class PsychCamera extends FlxCamera
 
 	public function updateFollowDelta(?elapsed:Float = 0):Void
 	{
-		// Either follow the object closely,
-		// or double check our deadzone and update accordingly.
+		if (target == null) return;
+
+		// Calculate basic follow position
 		if (deadzone == null)
 		{
 			target.getMidpoint(_point);
@@ -58,57 +76,75 @@ class PsychCamera extends FlxCamera
 				{
 					_scrollTarget.y -= viewHeight;
 				}
-				
-				// without this we see weird behavior when switching to SCREEN_BY_SCREEN at arbitrary scroll positions
+
 				bindScrollPos(_scrollTarget);
 			}
 			else
 			{
 				edge = targetX - deadzone.x;
-				if (_scrollTarget.x > edge)
-				{
-					_scrollTarget.x = edge;
-				}
+				if (_scrollTarget.x > edge) _scrollTarget.x = edge;
+
 				edge = targetX + target.width - deadzone.x - deadzone.width;
-				if (_scrollTarget.x < edge)
-				{
-					_scrollTarget.x = edge;
-				}
+				if (_scrollTarget.x < edge) _scrollTarget.x = edge;
 
 				edge = targetY - deadzone.y;
-				if (_scrollTarget.y > edge)
-				{
-					_scrollTarget.y = edge;
-				}
+				if (_scrollTarget.y > edge) _scrollTarget.y = edge;
+
 				edge = targetY + target.height - deadzone.y - deadzone.height;
-				if (_scrollTarget.y < edge)
-				{
-					_scrollTarget.y = edge;
-				}
+				if (_scrollTarget.y < edge) _scrollTarget.y = edge;
 			}
 
 			if ((target is FlxSprite))
 			{
 				if (_lastTargetPosition == null)
 				{
-					_lastTargetPosition = FlxPoint.get(target.x, target.y); // Creates this point.
+					_lastTargetPosition = FlxPoint.get(target.x, target.y);
 				}
+
 				_scrollTarget.x += (target.x - _lastTargetPosition.x) * followLead.x;
 				_scrollTarget.y += (target.y - _lastTargetPosition.y) * followLead.y;
 
-				_lastTargetPosition.x = target.x;
-				_lastTargetPosition.y = target.y;
+				_lastTargetPosition.set(target.x, target.y);
 			}
 		}
 
-		var mult:Float = 1 - Math.exp(-elapsed * followLerp);
-		scroll.x += (_scrollTarget.x - scroll.x) * mult;
-		scroll.y += (_scrollTarget.y - scroll.y) * mult;
-		//trace('lerp on this frame: $mult');
+		// Calculate Lerp Multipliers per axis
+		var lerpX:Float = (followLerpX >= 0) ? followLerpX : followLerp;
+		var lerpY:Float = (followLerpY >= 0) ? followLerpY : followLerp;
+
+		var multX:Float;
+		var multY:Float;
+
+		if (useDecaySmoothing)
+		{
+			// Delta-time independent exponential smoothing
+			multX = 1 - Math.exp(-elapsed * lerpX * 60);
+			multY = 1 - Math.exp(-elapsed * lerpY * 60);
+		}
+		else
+		{
+			// Standard FlxMath bound interpolation
+			multX = FlxMath.bound(elapsed * lerpX * 60, 0, 1);
+			multY = FlxMath.bound(elapsed * lerpY * 60, 0, 1);
+		}
+
+		// Apply scroll positioning
+		scroll.x += (_scrollTarget.x - scroll.x) * multX;
+		scroll.y += (_scrollTarget.y - scroll.y) * multY;
 	}
 
-	override function set_followLerp(value:Float)
+	override function set_followLerp(value:Float):Float
 	{
 		return followLerp = value;
+	}
+
+	override public function destroy():Void
+	{
+		if (_lastTargetPosition != null)
+		{
+			_lastTargetPosition.put();
+			_lastTargetPosition = null;
+		}
+		super.destroy();
 	}
 }
