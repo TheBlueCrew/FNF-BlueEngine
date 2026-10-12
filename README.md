@@ -1,3 +1,7 @@
+div align="center">
+  <img src="art/iconApp.png" alt="FNF: Blue Engine Icon" width="128" height="128" />
+  </div>
+
 # Friday Night Funkin' - Blue Engine
 Blue Engine is a fork of Psych Engine 0.7.3 with more modifications and softcode support.
 
